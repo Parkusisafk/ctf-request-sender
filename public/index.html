@@ -7,8 +7,17 @@
     <style>
         :root { --bg: #1e1e1e; --panel: #2d2d2d; --text: #d4d4d4; --accent: #007acc; }
         body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* Standard 50/50 grid for the top section */
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 800px) { .grid-container { grid-template-columns: 1fr; } }
+        
+        /* 1fr 4fr means 20% width for raw text, 80% for HTML */
+        .response-grid { display: grid; grid-template-columns: 1fr 4fr; gap: 20px; }
+        
+        @media (max-width: 800px) { 
+            .grid-container, .response-grid { grid-template-columns: 1fr; } 
+        }
+        
         .panel { background: var(--panel); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         h2, h3 { margin-top: 0; color: #fff; }
         input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #3c3c3c; border: 1px solid #555; color: #fff; border-radius: 4px; box-sizing: border-box; font-family: monospace;}
@@ -20,7 +29,8 @@
         pre { background: #1e1e1e; padding: 15px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; border: 1px solid #555; }
         .status-badge { display: inline-block; padding: 5px 10px; border-radius: 4px; font-weight: bold; margin-bottom: 10px; background: #444;}
         .status-200 { background: #28a745; } .status-400 { background: #dc3545; }
-        iframe { width: 100%; height: 300px; background: white; border: none; border-radius: 4px; }
+        
+        iframe { width: 100%; height: 400px; background: white; border: none; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -39,8 +49,7 @@
             </div>
 
             <h3>Headers / Parameters</h3>
-            <div id="headers-container">
-                </div>
+            <div id="headers-container"></div>
             <button class="btn-small" onclick="addHeaderRow()">+ Add Header (e.g., admin=true)</button>
 
             <h3 style="margin-top: 20px;">Body Data (For POST/PUT)</h3>
@@ -60,15 +69,17 @@ Host: ...</pre>
         <h2>Response</h2>
         <div id="statusCode" class="status-badge">Status: 000</div>
         
-        <div class="grid-container">
-            <div>
-                <h3>Raw Text</h3>
-                <pre id="resRawText" style="height: 300px; overflow-y: auto;"></pre>
-            </div>
+        <div class="response-grid">
             <div>
                 <h3>Rendered HTML</h3>
                 <iframe id="resHtmlRender"></iframe>
             </div>
+            <span></span>
+            <div>
+                <h3>Raw Text</h3>
+                <pre id="resRawText" style="height: 400px; overflow-y: auto;"></pre>
+            </div>
+
         </div>
     </div>
 
@@ -78,14 +89,13 @@ Host: ...</pre>
             const row = document.createElement('div');
             row.className = 'row header-row';
             row.innerHTML = `
-                <input type="text" class="h-key" placeholder="Header/Param Name (e.g. Cookie)" value="${key}" oninput="updatePreview()">
-                <input type="text" class="h-value" placeholder="Value (e.g. admin=true)" value="${value}" oninput="updatePreview()">
+                <input type="text" class="h-key" placeholder="Header/Param Name" value="${key}" oninput="updatePreview()">
+                <input type="text" class="h-value" placeholder="Value" value="${value}" oninput="updatePreview()">
                 <button class="btn-small btn-danger" onclick="this.parentElement.remove(); updatePreview()">X</button>
             `;
             container.appendChild(row);
         }
 
-        // Add a default row so they see how it works
         addHeaderRow('Cookie', 'admin=false');
 
         function updatePreview() {
@@ -99,7 +109,7 @@ Host: ...</pre>
                 const parsedUrl = new URL(urlVal);
                 path = parsedUrl.pathname + parsedUrl.search;
                 host = parsedUrl.host;
-            } catch(e) {} // Ignore invalid URLs while typing
+            } catch(e) {}
 
             let preview = `${method} ${path} HTTP/1.1\nHost: ${host}\n`;
 
@@ -141,7 +151,6 @@ Host: ...</pre>
 
                 const data = await res.json();
                 
-                // Update UI
                 document.getElementById('responsePanel').style.display = 'block';
                 
                 const statusEl = document.getElementById('statusCode');
@@ -149,7 +158,7 @@ Host: ...</pre>
                 statusEl.className = `status-badge ${data.status >= 200 && data.status < 300 ? 'status-200' : 'status-400'}`;
 
                 document.getElementById('resRawText').textContent = data.data;
-                document.getElementById('resHtmlRender').srcdoc = data.data; // Safely renders HTML
+                document.getElementById('resHtmlRender').srcdoc = data.data;
 
             } catch (err) {
                 alert('Request Failed: Make sure you entered a valid full URL starting with http:// or https://');
@@ -158,7 +167,6 @@ Host: ...</pre>
             }
         }
 
-        // Initial preview render
         updatePreview();
     </script>
 </body>

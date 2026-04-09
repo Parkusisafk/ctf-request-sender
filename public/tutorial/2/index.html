@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tutorial 2: Secure Login?</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: #eee; padding: 50px; text-align: center; }
+        .login-card { background: #252525; padding: 30px; border-radius: 10px; border: 1px solid #444; display: inline-block; }
+        input { display: block; width: 250px; padding: 10px; margin: 10px 0; background: #333; border: 1px solid #555; color: white; }
+        button { width: 100%; padding: 10px; background: #007acc; border: none; color: white; cursor: pointer; font-weight: bold; }
+        .hint-box { margin-top: 30px; color: #888; font-style: italic; max-width: 400px; margin-left: auto; margin-right: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Secure Management Portal</h1>
+    
+    <div class="login-card">
+        <form action="/tutorial/2/login" method="POST">
+            <input type="text" name="user" placeholder="Username (Try: admin)">
+            <input type="password" name="password" placeholder="Password">
+            <button type="submit">LOGIN</button>
+        </form>
+    </div>
+
+    <div class="hint-box">
+        <p><b>Tutorial Hint:</b> The developer tried to be efficient by checking the <code>password.length</code> before checking the actual string. Can you use the different error messages to figure out the password for <b>admin</b>?</p>
+        <a href="/sender" style="color: #007acc;">Use the Request Sender to test lengths quickly &rarr;</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web CTF Request Sender</title>
+    <style>
+        :root { --bg: #1e1e1e; --panel: #2d2d2d; --text: #d4d4d4; --accent: #007acc; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* Standard 50/50 grid for the top section */
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        /* 1fr 4fr means 20% width for raw text, 80% for HTML */
+        .response-grid { display: grid; grid-template-columns: 1fr 4fr; gap: 20px; }
+        
+        @media (max-width: 800px) { 
+            .grid-container, .response-grid { grid-template-columns: 1fr; } 
+        }
+        
+        .panel { background: var(--panel); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        h2, h3 { margin-top: 0; color: #fff; }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #3c3c3c; border: 1px solid #555; color: #fff; border-radius: 4px; box-sizing: border-box; font-family: monospace;}
+        button { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px;}
+        button:hover { background: #005f9e; }
+        .row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .btn-small { width: auto; padding: 8px 12px; background: #555; }
+        .btn-danger { background: #d16969; }
+        pre { background: #1e1e1e; padding: 15px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; border: 1px solid #555; }
+        .status-badge { display: inline-block; padding: 5px 10px; border-radius: 4px; font-weight: bold; margin-bottom: 10px; background: #444;}
+        .status-200 { background: #28a745; } .status-400 { background: #dc3545; }
+        
+        iframe { width: 100%; height: 400px; background: white; border: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="grid-container">
+        <div class="panel">
+            <h2>Request Builder</h2>
+            <div class="row">
+                <select id="method" style="flex: 1;" onchange="updatePreview()">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+                <input type="text" id="url" placeholder="http://target-site.com/flag" style="flex: 3;" oninput="updatePreview()">
+            </div>
+
+            <h3>Headers / Parameters</h3>
+            <div id="headers-container"></div>
+            <button class="btn-small" onclick="addHeaderRow()">+ Add Header (e.g., admin=true)</button>
+
+            <h3 style="margin-top: 20px;">Body Data (For POST/PUT)</h3>
+            <textarea id="bodyInput" rows="4" placeholder="user=test&pass=1234" oninput="updatePreview()"></textarea>
+
+            <button onclick="sendRequest()" style="margin-top: 15px;">SEND REQUEST 🚀</button>
+        </div>
+
+        <div class="panel">
+            <h2>Expected Raw Request</h2>
+            <pre id="rawPreview">GET / HTTP/1.1
+Host: ...</pre>
+        </div>
+    </div>
+
+    <div class="panel" id="responsePanel" style="display: none;">
+        <h2>Response</h2>
+        <div id="statusCode" class="status-badge">Status: 000</div>
+        
+        <div class="response-grid">
+            <div>
+                <h3>Rendered HTML</h3>
+                <iframe id="resHtmlRender"></iframe>
+            </div>
+            <span></span>
+            <div>
+                <h3>Raw Text</h3>
+                <pre id="resRawText" style="height: 400px; overflow-y: auto;"></pre>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function addHeaderRow(key = '', value = '') {
+            const container = document.getElementById('headers-container');
+            const row = document.createElement('div');
+            row.className = 'row header-row';
+            row.innerHTML = `
+                <input type="text" class="h-key" placeholder="Header/Param Name" value="${key}" oninput="updatePreview()">
+                <input type="text" class="h-value" placeholder="Value" value="${value}" oninput="updatePreview()">
+                <button class="btn-small btn-danger" onclick="this.parentElement.remove(); updatePreview()">X</button>
+            `;
+            container.appendChild(row);
+        }
+
+        addHeaderRow('Cookie', 'admin=false');
+
+        function updatePreview() {
+            const method = document.getElementById('method').value;
+            let urlVal = document.getElementById('url').value || 'http://example.com/';
+            const body = document.getElementById('bodyInput').value;
+            
+            let path = '/';
+            let host = 'example.com';
+            try {
+                const parsedUrl = new URL(urlVal);
+                path = parsedUrl.pathname + parsedUrl.search;
+                host = parsedUrl.host;
+            } catch(e) {}
+
+            let preview = `${method} ${path} HTTP/1.1\nHost: ${host}\n`;
+
+            const rows = document.querySelectorAll('.header-row');
+            rows.forEach(row => {
+                const k = row.querySelector('.h-key').value;
+                const v = row.querySelector('.h-value').value;
+                if (k) preview += `${k}: ${v}\n`;
+            });
+
+            if (body && (method === 'POST' || method === 'PUT')) {
+                preview += `\n${body}`;
+            }
+
+            document.getElementById('rawPreview').textContent = preview;
+        }
+
+        async function sendRequest() {
+            const btn = document.querySelector('button[onclick="sendRequest()"]');
+            btn.textContent = 'Sending...';
+            
+            const method = document.getElementById('method').value;
+            const url = document.getElementById('url').value;
+            const body = document.getElementById('bodyInput').value;
+            
+            const headers = {};
+            document.querySelectorAll('.header-row').forEach(row => {
+                const k = row.querySelector('.h-key').value;
+                const v = row.querySelector('.h-value').value;
+                if (k) headers[k] = v;
+            });
+
+            try {
+                const res = await fetch('/api/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, method, headers, body })
+                });
+
+                const data = await res.json();
+                
+                document.getElementById('responsePanel').style.display = 'block';
+                
+                const statusEl = document.getElementById('statusCode');
+                statusEl.textContent = `Status: ${data.status} ${data.statusText}`;
+                statusEl.className = `status-badge ${data.status >= 200 && data.status < 300 ? 'status-200' : 'status-400'}`;
+
+                document.getElementById('resRawText').textContent = data.data;
+                document.getElementById('resHtmlRender').srcdoc = data.data;
+
+            } catch (err) {
+                alert('Request Failed: Make sure you entered a valid full URL starting with http:// or https://');
+            } finally {
+                btn.textContent = 'SEND REQUEST 🚀';
+            }
+        }
+
+        updatePreview();
+    </script>
+</body>
+</html>

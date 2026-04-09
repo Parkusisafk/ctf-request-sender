@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure File Server</title>
+    <style>
+        body { font-family: sans-serif; background: #1e1e1e; color: #eee; padding: 50px; text-align: center; }
+        .card { background: #252525; padding: 30px; border-radius: 8px; border: 1px solid #444; max-width: 400px; margin: auto; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007acc; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>📄 Legal Documents Server</h2>
+        <p>Download the public terms of service below. All files are served securely to prevent directory climbing attacks.</p>
+        
+        <a href="/chal/3/download?file=public_terms.pdf" class="btn">Download TOS.pdf</a>
+        
+        <div style="margin-top: 30px; color: #888; font-size: 0.8em; text-align: left;">
+            <b>Developer Log:</b><br>
+            - Configured file server to serve from <code>/var/www/html/docs/</code><br>
+            - Left the master backup in the root directory: <code>/var/www/html/flag.txt</code><br>
+            - Added strict filter to block <code>../</code> so hackers can't go up directories.
+        </div>
+    </div>
+</body>
+</html>

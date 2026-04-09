@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Legacy Login - v2.4.1 (Deprecated)</title>
+    <style>
+        body { font-family: 'Courier New', Courier, monospace; background: #222; color: #aaa; padding: 50px; text-align: center; }
+        .deprecated-banner { background: #442222; color: #ff6666; padding: 10px; border: 1px solid #ff6666; margin-bottom: 20px; }
+        .login-box { background: #333; padding: 30px; display: inline-block; border: 1px solid #555; text-align: left; }
+        input { background: #111; border: 1px solid #555; color: #0f0; padding: 10px; margin: 10px 0; width: 250px; }
+        .hint { font-size: 0.8em; color: #666; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="deprecated-banner">
+        ⚠️ WARNING: THIS SYSTEM HAS BEEN ABANDONED SINCE 2021. <br>
+        IT IS NO LONGER COMPATIBLE WITH MODERN BROWSERS.
+    </div>
+
+    <div class="login-box">
+        <form action="/chals/1/login" method="POST">
+            <label>Username:</label><br>
+            <input type="text" name="User" placeholder="Internal ID"><br>
+            <label>Activation Year:</label><br>
+            <input type="text" name="Year" placeholder="YYYY"><br>
+            <button type="submit" style="width: 100%; padding: 10px; background: #555; color: white; border: none; cursor: pointer;">RECOVER ACCOUNT</button>
+        </form>
+    </div>
+
+    <div class="hint">
+        <p><i>Developer Note (Oct 2021):</i> "Samuel, I've moved the main login to the new site, but kept this 'Maximum' auth tunnel open for John in case he forgets his password. Remember to set his <b>admin cookie</b> to true and make sure he clicks the link from the <b>old-auth.site</b> homepage or it won't work."</p>
+    </div>
+</body>
+</html>

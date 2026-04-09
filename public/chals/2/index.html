@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Internal Communication Hub</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #121212; color: white; display: flex; flex-direction: column; align-items: center; padding-top: 100px; }
+        .login-box { background: #1e1e1e; padding: 40px; border-radius: 12px; border: 1px solid #333; width: 350px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #2d2d2d; border: 1px solid #444; color: white; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #007acc; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .warning { color: #ffc107; font-size: 0.85em; margin-top: 20px; border: 1px dashed #ffc107; padding: 10px; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>Staff Portal</h2>
+        <form action="/chals/2/login" method="POST">
+            <input type="text" name="user" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">LOGIN</button>
+        </form>
+        <div class="warning">
+            <b>NOTICE:</b> To solve the problem of people only remembering their passwords and not their usernames, our technical team has pushed out a new feature where we will suggest you the username if you got your password right! <code>we hope this increases your convenience and work productivity</code>. 
+        </div>
+    </div>
+</body>
+</html>

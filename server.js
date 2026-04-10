@@ -15,9 +15,9 @@ app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] })
 // --- CHALLENGE DATA ---
 // We use the ID as the key. Both Tutorial and DIY will share these descriptions.
 const challenges = {
-    "1": { title: "Challenge 1: The Basics", msg: "Learn how to use GET parameters to extract hidden data from the server." },
-    "2": { title: "Challenge 2: Hidden Paths", msg: "Explore directory structures to find files the developer forgot to delete." },
-    "3": { title: "Challenge 3: Digital Identity", msg: "Manipulate cookies to escalate your privileges to Administrator." },
+    "1": { title: "Challenge 1: The Basics", msg: "Learn how to use custom request parameters" },
+    "2": { title: "Challenge 2: Exploit Hunting", msg: "Explore vulnerabilities" },
+    "3": { title: "Challenge 3: Hidden Paths", msg: "Traverse your way! " },
     "4": { title: "THE FINAL CHALLENGE", msg: "Your goal is to shut down this website. Maybe you can try viewing the files at /chal/4/view?file=...... Hint: maybe look at server.js? but where is it?" }
 };
 
